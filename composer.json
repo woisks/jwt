@@ -1,0 +1,19 @@
+{
+  "name": "woisks/jwt",
+  "description": "woisks jwt token",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "lifenglin",
+      "email": "woisks@126.com"
+    }
+  ],
+  "require": {
+    "php": "7.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Woisks\\Jwt\\": "src/"
+    }
+  }
+}
