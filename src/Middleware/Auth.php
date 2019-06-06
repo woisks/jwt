@@ -5,6 +5,7 @@ namespace Woisks\Jwt\Middleware;
 
 
 use Closure;
+use Woisks\Jwt\Services\JwtService;
 
 /**
  * Class Auth
@@ -25,19 +26,19 @@ class Auth
      */
     public function handle($request, Closure $next)
     {
-        $token = jwt_parser_token();
+        $token = JwtService::jwt_parser_token();
         if (!$token) {
             return res(1001, 'param error lack token ');
         }
 
-        $payload = jwt_token_info();
+        $payload = JwtService::jwt_token_info();
         if (!is_array($payload)) {
-            return res(401, 'Token Invalid');
+            return res(401, 'token invalid');
         }
 
         $iva = \Redis::get('token:' . $payload['ide'] . ':' . $payload['mac']);
 
-        return $iva == $payload['iva'] ? $next($request) : res(401, 'Token Expired');
+        return $iva == $payload['iva'] ? $next($request) : res(401, 'token expired');
     }
 
 

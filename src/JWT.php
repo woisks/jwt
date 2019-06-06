@@ -18,6 +18,15 @@ class JWT
 
 
     /**
+     * alg
+     *
+     * @var string
+     * ------------------------------------------------------
+     * @Author: Maple Grove  <bolelin@126.com> 2019/5/3 22:44
+     */
+    private $alg = 'HS256';
+
+    /**
      * encode_jwt 2019/5/14 8:51
      *
      * @param array  $payload
@@ -33,35 +42,6 @@ class JWT
             return null;
         }
     }
-
-
-    /**
-     * decode_jwt 2019/5/14 8:50
-     *
-     * @param string $token
-     * @param string $secret_key
-     *
-     * @return null|array
-     */
-    public static function decode_jwt(string $token, string $secret_key)
-    {
-        try {
-            return (new JWT)->decode($token, $secret_key);
-        } catch (InvalidException $e) {
-            return null;
-        }
-    }
-
-
-    /**
-     * alg
-     *
-     * @var string
-     * ------------------------------------------------------
-     * @Author: Maple Grove  <bolelin@126.com> 2019/5/3 22:44
-     */
-    private $alg = 'HS256';
-
 
     /**
      * encode
@@ -89,6 +69,83 @@ class JWT
         return implode('.', $segments);
     }
 
+    /**
+     * base64UrlSafeEncode
+     *
+     * @param string $str
+     *
+     * @return string
+     * ------------------------------------------------------
+     * @Author: Maple Grove  <bolelin@126.com> 2019/5/3 22:44
+     */
+    private function base64UrlSafeEncode(string $str)
+    {
+        return str_replace('=', '', strtr(base64_encode($str), '+/', '-_'));
+    }
+
+    /**
+     * jsonEncode
+     *
+     * @param array $data
+     *
+     * @return string
+     * @throws InvalidException
+     * ------------------------------------------------------
+     * @Author: Maple Grove  <bolelin@126.com> 2019/5/3 22:44
+     */
+    private function jsonEncode(array $data)
+    {
+        $json = json_encode($data);
+        if (json_last_error() != JSON_ERROR_NONE) {
+            throw new InvalidException('Error while encoding to JSON: '
+                . json_last_error_msg());
+        }
+
+        return $json;
+    }
+
+    /**
+     * sign
+     *
+     * @param string $str
+     * @param string $secret_key
+     * @param string $encrypt_method
+     *
+     * @return string
+     * @throws InvalidException
+     * ------------------------------------------------------
+     * @Author: Maple Grove  <bolelin@126.com> 2019/5/3 22:44
+     */
+    private function sign(string $str, string $secret_key, string $encrypt_method)
+    {
+        $methods = [
+            'HS256' => 'sha256',
+            'HS384' => 'sha384',
+            'HS512' => 'sha512',
+        ];
+        if (empty($methods[$encrypt_method])) {
+            throw new InvalidException('Algorithm not supported');
+        }
+
+        return hash_hmac($methods[$encrypt_method], $str, $secret_key, true);
+    }
+
+    /**
+     * decode_jwt 2019/5/14 8:50
+     *
+     * @param string $token
+     * @param string $secret_key
+     *
+     * @return null|array
+     */
+    public static function decode_jwt(string $token, string $secret_key)
+    {
+        try {
+            return (new JWT)->decode($token, $secret_key);
+        } catch (InvalidException $e) {
+            return null;
+        }
+    }
 
     /**
      * decode
@@ -121,44 +178,6 @@ class JWT
         throw new InvalidException('Wrong number of segments');
     }
 
-
-    /**
-     * jsonEncode
-     *
-     * @param array $data
-     *
-     * @return string
-     * @throws InvalidException
-     * ------------------------------------------------------
-     * @Author: Maple Grove  <bolelin@126.com> 2019/5/3 22:44
-     */
-    private function jsonEncode(array $data)
-    {
-        $json = json_encode($data);
-        if (json_last_error() != JSON_ERROR_NONE) {
-            throw new InvalidException('Error while encoding to JSON: '
-                . json_last_error_msg());
-        }
-
-        return $json;
-    }
-
-
-    /**
-     * base64UrlSafeEncode
-     *
-     * @param string $str
-     *
-     * @return string
-     * ------------------------------------------------------
-     * @Author: Maple Grove  <bolelin@126.com> 2019/5/3 22:44
-     */
-    private function base64UrlSafeEncode(string $str)
-    {
-        return str_replace('=', '', strtr(base64_encode($str), '+/', '-_'));
-    }
-
-
     /**
      * jsonDecode
      *
@@ -180,7 +199,6 @@ class JWT
         return $data;
     }
 
-
     /**
      * base64UrlSafeDecode
      *
@@ -198,34 +216,6 @@ class JWT
 
         return base64_decode(strtr($str, '-_', '+/'));
     }
-
-
-    /**
-     * sign
-     *
-     * @param string $str
-     * @param string $secret_key
-     * @param string $encrypt_method
-     *
-     * @return string
-     * @throws InvalidException
-     * ------------------------------------------------------
-     * @Author: Maple Grove  <bolelin@126.com> 2019/5/3 22:44
-     */
-    private function sign(string $str, string $secret_key, string $encrypt_method)
-    {
-        $methods = [
-            'HS256' => 'sha256',
-            'HS384' => 'sha384',
-            'HS512' => 'sha512',
-        ];
-        if (empty($methods[$encrypt_method])) {
-            throw new InvalidException('Algorithm not supported');
-        }
-
-        return hash_hmac($methods[$encrypt_method], $str, $secret_key, true);
-    }
-
 
     /**
      * verify

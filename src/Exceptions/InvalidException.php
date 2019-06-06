@@ -19,7 +19,9 @@ declare(strict_types=1);
 namespace Woisks\Jwt\Exceptions;
 
 
-class InvalidException extends \Exception
+use Exception;
+
+class InvalidException extends Exception
 {
 
 }
