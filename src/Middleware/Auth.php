@@ -33,12 +33,12 @@ class Auth
 
         $payload = JwtService::jwt_token_info();
         if (!is_array($payload)) {
-            return res(401, 'token invalid');
+            return res(1002, 'token invalid');
         }
 
         $iva = \Redis::get('token:' . $payload['ide'] . ':' . $payload['mac']);
 
-        return $iva == $payload['iva'] ? $next($request) : res(401, 'token expired');
+        return $iva == $payload['iva'] ? $next($request) : res(1002, 'token expired');
     }
 
 
