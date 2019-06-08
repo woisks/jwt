@@ -38,7 +38,7 @@ class Auth
 
         $iva = \Redis::get('token:' . $payload['ide'] . ':' . $payload['mac']);
 
-        return $iva == $payload['iva'] ? $next($request) : res(1002, 'token expired');
+        return $iva == $payload['iva'] ? $next($request) : res(1003, 'token expired');
     }
 
 

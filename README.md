@@ -1,7 +1,7 @@
 ## status code
 
-1001 param error lack token 
+### 1003 token expired
 
-1002 token invalid or token expired
+### 1002 token invalid 
 
-
+### 1001 param error lack token 
